@@ -92,14 +92,6 @@ namespace StrawhatNet.Study.BTRFCommDevTest
                 // 結果を読み取る
                 DataReader dr = new DataReader(streamSocket.InputStream);
 
-                //var loadSize = await dr.LoadAsync(sizeof(byte));
-                //if (loadSize < sizeof(byte))
-                //{
-                //    WriteLog("切断されました");
-                //    return;
-                //}
-
-                //uint readSize = (uint)writeByteData.Length;
                 uint readSize = writeBytesSize;
                 var loadSize = await dr.LoadAsync(readSize);
                 if (loadSize < readSize)

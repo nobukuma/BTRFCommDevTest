@@ -42,6 +42,7 @@ namespace StrawhatNet.Study.BTRFCommDevTest
 
             try
             {
+                this.deviceListBox.ItemsSource = Enumerable.Empty<BluetoothDeviceInfo>();
                 WriteLog("デバイスを探索しています");
                 var pairedDevices = await PeerFinder.FindAllPeersAsync();
 
@@ -157,18 +158,11 @@ namespace StrawhatNet.Study.BTRFCommDevTest
         {
             base.OnNavigatedFrom(e);
 
-            //if (e.NavigationMode != NavigationMode.Back)
-            //{
-                this.SearchButton.IsEnabled = true;
-                this.ConnectButton.IsEnabled = false;
-                this.streamSocket = null;
-                this.bluetoothDeviceInfo = new BluetoothDeviceInfo();
-            //}
-            //else
-            //{
-            //    // 他AP画面から戻ってきた場合：　接続が破棄されているはず
-            //    // XXX: 初期化しなおす?
-            //}
+            this.SearchButton.IsEnabled = true;
+            this.ConnectButton.IsEnabled = false;
+            this.streamSocket = null;
+            this.bluetoothDeviceInfo = new BluetoothDeviceInfo();
+
             return;
         }
 
@@ -185,21 +179,5 @@ namespace StrawhatNet.Study.BTRFCommDevTest
 
             return;
         }
-
-        // ローカライズされた ApplicationBar を作成するためのサンプル コード
-        //private void BuildLocalizedApplicationBar()
-        //{
-        //    // ページの ApplicationBar を ApplicationBar の新しいインスタンスに設定します。
-        //    ApplicationBar = new ApplicationBar();
-
-        //    // 新しいボタンを作成し、テキスト値を AppResources のローカライズされた文字列に設定します。
-        //    ApplicationBarIconButton appBarButton = new ApplicationBarIconButton(new Uri("/Assets/AppBar/appbar.add.rest.png", UriKind.Relative));
-        //    appBarButton.Text = AppResources.AppBarButtonText;
-        //    ApplicationBar.Buttons.Add(appBarButton);
-
-        //    // AppResources のローカライズされた文字列で、新しいメニュー項目を作成します。
-        //    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.AppBarMenuItemText);
-        //    ApplicationBar.MenuItems.Add(appBarMenuItem);
-        //}
     }
 }
