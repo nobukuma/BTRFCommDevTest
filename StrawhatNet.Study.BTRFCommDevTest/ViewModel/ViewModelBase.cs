@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace StrawhatNet.Study.BTRFCommDevTest.ViewModel
 {
-    abstract public class ViewModelBase : INotifyPropertyChanged
+    public class ViewModelBase : INotifyPropertyChanged
     {
-        protected event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected void RaisePropertyChangedEvent(string argName)
         {

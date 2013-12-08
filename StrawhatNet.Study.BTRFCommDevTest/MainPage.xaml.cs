@@ -48,7 +48,7 @@ namespace StrawhatNet.Study.BTRFCommDevTest
             //this.LogTextBox.Items.Add(DateTime.Now.ToString() + " " + text);
             //this.LogTextBox.SelectedIndex = this.LogTextBox.Items.Count - 1;
 
-            this.LogTextBox.Text += DateTime.Now.ToString() + " " + text;
+            this.LogTextBox.Text += DateTime.Now.ToString() + " " + text + "\n";
 
             return;
         }
