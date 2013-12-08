@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace StrawhatNet.Study.BTRFCommDevTest.ViewModel
 {
-    public class MainPageViewModel : INotifyPropertyChanged
+    public class MainPageViewModel : ViewModelBase
     {
         private bool isConnected;
         public bool IsConnected {
@@ -80,15 +80,6 @@ namespace StrawhatNet.Study.BTRFCommDevTest.ViewModel
                 RaisePropertyChangedEvent("BluetoothDeviceInfo");
 
                 this.IsConnected = this.bluetoothDeviceInfo.IsConnected;
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void RaisePropertyChangedEvent(string argName)
-        {
-            if (PropertyChanged != null)
-            {
-                this.PropertyChanged.Invoke(this, new PropertyChangedEventArgs(argName));
             }
         }
     }

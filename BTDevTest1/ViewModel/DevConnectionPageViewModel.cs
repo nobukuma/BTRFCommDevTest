@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace StrawhatNet.Study.BTRFCommDevTest.ViewModel
 {
-    public class DevConnectionPageViewModel : INotifyPropertyChanged
+    public class DevConnectionPageViewModel : ViewModelBase
     {
         private bool isConnected;
         public bool IsConnected {
@@ -19,11 +19,8 @@ namespace StrawhatNet.Study.BTRFCommDevTest.ViewModel
             set
             {
                 this.isConnected = value;
-                if (PropertyChanged != null)
-                {
-                    this.PropertyChanged.Invoke(this, new PropertyChangedEventArgs("ConnectButtonIsVisible"));
-                    this.PropertyChanged.Invoke(this, new PropertyChangedEventArgs("DisconnectButtonIsVisible"));
-                }
+                RaisePropertyChangedEvent("ConnectButtonIsVisible");
+                RaisePropertyChangedEvent("DisconnectButtonIsVisible");
             }
         }
 
@@ -53,13 +50,8 @@ namespace StrawhatNet.Study.BTRFCommDevTest.ViewModel
             set
             {
                 this._listItem = value;
-                if (PropertyChanged != null)
-                {
-                    this.PropertyChanged.Invoke(this, new PropertyChangedEventArgs("ListItem"));
-                }
+                RaisePropertyChangedEvent("ListItem");
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
