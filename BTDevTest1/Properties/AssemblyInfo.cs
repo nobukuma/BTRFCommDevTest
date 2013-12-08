@@ -6,11 +6,11 @@ using System.Resources;
 // アセンブリに関する一般情報は、以下の属性セットによって制御されます。 
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更します。
-[assembly: AssemblyTitle("BT Device Test")]
-[assembly: AssemblyDescription("BT Device Test")]
+[assembly: AssemblyTitle("Bluetooth RFComm Dev Test")]
+[assembly: AssemblyDescription("Connect to bluetooth device via RFCOMM")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Strawhat Network")]
-[assembly: AssemblyProduct("BT Device Test")]
+[assembly: AssemblyProduct("Bluetooth RFComm Dev Test")]
 [assembly: AssemblyCopyright("Copyright ©  2013 nobukuma")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

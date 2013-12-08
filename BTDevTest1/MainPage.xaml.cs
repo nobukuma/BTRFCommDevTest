@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using StrawhatNet.Study.BTDevTest1.Resources;
+using StrawhatNet.Study.BTRFCommDevTest.Resources;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Text;
@@ -16,19 +16,13 @@ using Windows.Networking.Proximity;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Microsoft.Phone.Tasks;
+using StrawhatNet.Study.BTRFCommDevTest.ViewModel;
 
-namespace StrawhatNet.Study.BTDevTest1
+namespace StrawhatNet.Study.BTRFCommDevTest
 {
-    public class ListItem
-    {
-        public string DisplayName { get; set; }
-        public string ServiceName { get; set; }
-        public Windows.Networking.HostName HostName { get; set; }
-    }
-
     public partial class MainPage : PhoneApplicationPage
     {
-        private StreamSocket socket;
+        private StreamSocket streamSocket;
 
         // コンストラクター
         public MainPage()
@@ -46,122 +40,27 @@ namespace StrawhatNet.Study.BTDevTest1
 
         private void ApplicationBarMenuItem_Click(object sender, EventArgs e)
         {
-
-        }
-
-         private const string SerialPortServiceClass_UUID = "{00001101-0000-1000-8000-00805F9B34FB}";
-
-        private async void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            //PeerFinder.AlternateIdentities["Bluetooth:Paired"] = "";
-            PeerFinder.AlternateIdentities["Bluetooth:SDP"] = SerialPortServiceClass_UUID;
-
-            try
-            {
-                var pairedDevices = await PeerFinder.FindAllPeersAsync();
-
-                if (pairedDevices.Count == 0)
-                {
-                    WriteLog("No paired devices were found.");
-                }
-                else
-                {
-                    var items = from item in pairedDevices
-                                select new ListItem
-                                {
-                                    DisplayName = item.DisplayName,
-                                    ServiceName = item.ServiceName,
-                                    HostName = item.HostName,
-                                };
-                    this.deviceListBox.ItemsSource = items.ToArray();
-                    WriteLog(String.Format("{0} devices found", pairedDevices.Count));
-
-                    this.ConnectButton.IsEnabled = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                if ((uint)ex.HResult == 0x8007048F)
-                {
-                    var result = MessageBox.Show("Bluetoothが有効になっていません。OKを押すと設定します", "Bluetoothオフ", MessageBoxButton.OKCancel);
-                    if (result == MessageBoxResult.OK)
-                    {
-                        ShowBluetoothcControlPanel();
-                    }
-                }
-                else if ((uint)ex.HResult == 0x80070005)
-                {
-                    MessageBox.Show("アプリにID_CAP_PROXIMITY権限が設定されていません");
-                }
-                else
-                {
-                    MessageBox.Show(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
-                    Debug.WriteLine(ex.HResult);
-                }
-            }
-        }
-
-        private void ShowBluetoothcControlPanel()
-        {
-            ConnectionSettingsTask connectionSettingsTask = new ConnectionSettingsTask();
-            connectionSettingsTask.ConnectionSettingsType = ConnectionSettingsType.Bluetooth;
-            connectionSettingsTask.Show();
-        }
-
-        private async void ConnectButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.deviceListBox.SelectedItem == null)
-            {
-                WriteLog("選択されていません");
-                return;
-            }
-
-            var selectedDevice = this.deviceListBox.SelectedItem as ListItem;
-            WriteLog(String.Format("接続しています...: {0}:{1}",
-                selectedDevice.DisplayName,
-                selectedDevice.ServiceName));
-
-            this.socket = new StreamSocket();
-            try
-            {
-                await socket.ConnectAsync(selectedDevice.HostName, "1");
-
-                this.ConnectButton.IsEnabled = false;
-                this.ReadButton.IsEnabled = true;
-                this.DisconnectButton.IsEnabled = true;
-                WriteLog("接続しました");
-            }
-            catch (Exception ex)
-            {
-                WriteLog("接続失敗: " + ex.Message);
-                Debug.WriteLine(ex.StackTrace);
-                Debug.WriteLine(ex.HResult);
-            }
-
-            return;
-        }
-
-        private void PhoneApplicationPage_Loaded_1(object sender, RoutedEventArgs e)
-        {
-            this.ConnectButton.IsEnabled = false;
-            this.ReadButton.IsEnabled = false;
-            this.DisconnectButton.IsEnabled = false;
-            return;
-
+            BluetoothControlPanelUtil.ShowBluetoothControlPanel();
         }
 
         private void WriteLog(string text)
         {
-            this.LogTextBox.Items.Add(DateTime.Now.ToString() + " " + text);
-            this.LogTextBox.SelectedIndex = this.LogTextBox.Items.Count - 1;
+            //this.LogTextBox.Items.Add(DateTime.Now.ToString() + " " + text);
+            //this.LogTextBox.SelectedIndex = this.LogTextBox.Items.Count - 1;
+
+            this.LogTextBox.Text += DateTime.Now.ToString() + " " + text;
 
             return;
         }
 
-        private async void ReadButton_Click(object sender, RoutedEventArgs e)
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            if (this.socket == null)
+            NavigationService.Navigate(new Uri("/DevConnectionPage.xaml", UriKind.Relative));
+        }
+
+        private async void SendButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.streamSocket == null)
             {
                 WriteLog("接続していません");
                 return;
@@ -171,7 +70,7 @@ namespace StrawhatNet.Study.BTDevTest1
             {
                 List<byte> data = new List<byte>();
                 uint len = 1;
-                DataReader dr = new DataReader(socket.InputStream);
+                DataReader dr = new DataReader(streamSocket.InputStream);
                 while (true)
                 {
                     await dr.LoadAsync(len);
@@ -210,13 +109,39 @@ namespace StrawhatNet.Study.BTDevTest1
 
         private void Disconnect()
         {
-            this.socket.Dispose();
+            this.streamSocket.Dispose();
+            WriteLog("切断しました");
+        }
 
-            this.ConnectButton.IsEnabled = true;
-            this.ReadButton.IsEnabled = false;
-            this.DisconnectButton.IsEnabled = false;
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
 
-            WriteLog("Disconnected");
+            if (e.NavigationMode == NavigationMode.Back)
+            {
+                if (PhoneApplicationService.Current.State.ContainsKey(DevConnectionPage.OUTARG_BLUETOOTHDEVINFO))
+                {
+                    var state = PhoneApplicationService.Current.State;
+
+                    this.streamSocket = state[DevConnectionPage.OUTARG_SOCKET] as StreamSocket;
+
+                    var dataContext = DataContext as MainPageViewModel;
+                    dataContext.BluetoothDeviceInfo = state[DevConnectionPage.OUTARG_BLUETOOTHDEVINFO] as BluetoothDeviceInfo;
+                }
+            }
+            else {
+                this.streamSocket = null;
+
+                var dataContext = DataContext as MainPageViewModel;
+                dataContext.BluetoothDeviceInfo = new BluetoothDeviceInfo();
+            }
+            return;
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            return;
         }
 
         // ローカライズされた ApplicationBar を作成するためのサンプル コード

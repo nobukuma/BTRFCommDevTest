@@ -6,9 +6,9 @@ using System.Windows.Markup;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using StrawhatNet.Study.BTDevTest1.Resources;
+using StrawhatNet.Study.BTRFCommDevTest.Resources;
 
-namespace StrawhatNet.Study.BTDevTest1
+namespace StrawhatNet.Study.BTRFCommDevTest
 {
     public partial class App : Application
     {

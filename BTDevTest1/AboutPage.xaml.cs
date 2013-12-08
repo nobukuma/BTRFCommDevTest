@@ -12,7 +12,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 
-namespace StrawhatNet.Study.BTDevTest1
+namespace StrawhatNet.Study.BTRFCommDevTest
 {
     public partial class AboutPage : PhoneApplicationPage
     {

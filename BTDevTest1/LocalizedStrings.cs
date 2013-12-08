@@ -1,6 +1,6 @@
-﻿using StrawhatNet.Study.BTDevTest1.Resources;
+﻿using StrawhatNet.Study.BTRFCommDevTest.Resources;
 
-namespace StrawhatNet.Study.BTDevTest1
+namespace StrawhatNet.Study.BTRFCommDevTest
 {
     /// <summary>
     /// 文字列リソースにアクセスできるようにします。

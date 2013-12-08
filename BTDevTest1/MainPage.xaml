@@ -1,9 +1,10 @@
 ﻿<phone:PhoneApplicationPage
-    x:Class="StrawhatNet.Study.BTDevTest1.MainPage"
+    x:Class="StrawhatNet.Study.BTRFCommDevTest.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:vm="clr-namespace:StrawhatNet.Study.BTRFCommDevTest.ViewModel"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -11,8 +12,12 @@
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
-    shell:SystemTray.IsVisible="True" Loaded="PhoneApplicationPage_Loaded_1">
-    
+    shell:SystemTray.IsVisible="True">
+
+    <phone:PhoneApplicationPage.DataContext>
+        <vm:MainPageViewModel/>
+    </phone:PhoneApplicationPage.DataContext>
+
     <phone:PhoneApplicationPage.Resources>
         <DataTemplate x:Key="DataTemplate1">
             <Border BorderBrush="Black" BorderThickness="1" Width="400">
@@ -26,7 +31,7 @@
                 </Grid>
             </Border>
         </DataTemplate>
-        
+
         <DataTemplate x:Key="DataTemplate2">
             <Grid>
                 <TextBlock Text="{Binding }" TextWrapping="Wrap" />
@@ -41,39 +46,71 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,16">
             <TextBlock x:Name="ApplicationTitle" Style="{StaticResource PhoneTextNormalStyle}">
                 <Run Text="{Binding Path=LocalizedResources.ApplicationTitle, Source={StaticResource LocalizedStrings}}"/>
                 <Run Text=" - "/>
-                <Run Text="{Binding Path=LocalizedResources.ApplicationDescription, Source={StaticResource LocalizedStrings}}"/>
+                <Run Text="{Binding Path=LocalizedResources.Label_DevConectionPageTitle, Source={StaticResource LocalizedStrings}}"/>
             </TextBlock>
-            <TextBlock Margin="9,0,0,0" Text="{Binding Path=LocalizedResources.Label_MainPageTitle, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextLargeStyle}"/>
         </StackPanel>
 
         <Grid x:Name="ContentPanel" Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="80"/>
-                <RowDefinition Height="80"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="180"/>
+                <RowDefinition Height="80"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
-                <Button x:Name="SearchButton" Content="Search" HorizontalAlignment="Left" VerticalAlignment="Top" Click="SearchButton_Click"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,0,0,0" Grid.Row="1">
-                <Button x:Name="ConnectButton" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ConnectButton_Click"/>
-                <Button x:Name="ReadButton" Content="Read" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ReadButton_Click"/>
-                <Button x:Name="DisconnectButton" Content="Disconnect" HorizontalAlignment="Left" VerticalAlignment="Top" Click="DisconnectButton_Click"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="150"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Vertical" Margin="12,0,0,0">
+                <TextBlock Text="接続デバイス"/>
+                <TextBlock x:Name="ConnectedDeviceName"
+                        Text="{Binding ConnectedDeviceName}"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource PhoneTextNormalStyle}"/>
+                <TextBlock x:Name="ConnectedDevice"
+                        Text="{Binding ConnectedDeviceAddress}"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource PhoneTextSmallStyle}"/>
             </StackPanel>
 
-            <ListBox x:Name="deviceListBox" BorderThickness="3"
-                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                     Grid.Row="2" Margin="12" ItemTemplate="{StaticResource DataTemplate1}">
-                <ListBox.BorderBrush>
-                    <SolidColorBrush Color="{StaticResource PhoneBorderColor}"/>
-                </ListBox.BorderBrush>
-            </ListBox>
-            <ListBox Grid.Row="3" BorderThickness="3" Margin="12"
+            <Button x:Name="ConnectButton"
+                    Grid.Row="0" Grid.Column="1"
+                    Content="接続"
+                    Visibility="{Binding ConnectButtonIsVisible}"
+                    IsEnabled="{Binding ConnectButtonIsEnabled}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Click="ConnectButton_Click"/>
+            <Button x:Name="DisconnectButton"
+                    Grid.Row="0" Grid.Column="1"
+                    Content="切断"
+                    Visibility="{Binding DisconnectButtonIsVisible}"
+                    IsEnabled="{Binding DisconnectButtonIsEnabled}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Click="DisconnectButton_Click"/>
+
+            <TextBox x:Name="messageTextBox"
+                     Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                     BorderThickness="3"/>
+            <Button x:Name="SendButton"
+                    Grid.Row="2" Grid.Column="1"
+                    Content="送信"
+                    IsEnabled="{Binding SendButtonIsEnabled}"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Click="SendButton_Click"/>
+
+            <ScrollViewer Grid.Row="3" Grid.ColumnSpan="2">
+                <TextBox x:Name="LogTextBox" BorderThickness="3"/>
+            </ScrollViewer>
+
+            <!--<ListBox Grid.Row="3" BorderThickness="3" Margin="12"
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
                         x:Name="LogTextBox" ItemTemplate="{StaticResource DataTemplate2}">
                 <ListBox.Background>
@@ -82,7 +119,7 @@
                 <ListBox.BorderBrush>
                 <SolidColorBrush Color="{StaticResource PhoneBorderColor}"/>
                 </ListBox.BorderBrush>
-            </ListBox>
+            </ListBox>-->
 
         </Grid>
     </Grid>
@@ -91,7 +128,7 @@
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
             <shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="アプリについて..." Click="ApplicationBarMenuItem_About_Click"/>
-                <shell:ApplicationBarMenuItem Text="設定" Click="ApplicationBarMenuItem_Click"/>
+                <shell:ApplicationBarMenuItem Text="Bluetooth設定" Click="ApplicationBarMenuItem_Click"/>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>

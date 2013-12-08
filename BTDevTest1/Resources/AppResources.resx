@@ -154,9 +154,6 @@
   <data name="AboutText_Notice_NounProject_Header" xml:space="preserve">
     <value>The Noun Project</value>
   </data>
-  <data name="ApplicationDescription" xml:space="preserve">
-    <value>BT Device Test</value>
-  </data>
   <data name="ApplicationRelease" xml:space="preserve">
     <value>Vesion 1.0.0</value>
   </data>
@@ -170,6 +167,9 @@
     <value>Copyright (c) 2013 nobukuma</value>
   </data>
   <data name="Label_MainPageTitle" xml:space="preserve">
-    <value>SPP Test</value>
+    <value>RFCommでの通信</value>
+  </data>
+  <data name="Label_DevConectionPageTitle" xml:space="preserve">
+    <value>BTデバイス探索・接続</value>
   </data>
 </root>
