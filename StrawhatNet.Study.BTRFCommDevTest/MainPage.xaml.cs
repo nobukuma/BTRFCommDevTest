@@ -45,10 +45,8 @@ namespace StrawhatNet.Study.BTRFCommDevTest
 
         private void WriteLog(string text)
         {
-            //this.LogTextBox.Items.Add(DateTime.Now.ToString() + " " + text);
-            //this.LogTextBox.SelectedIndex = this.LogTextBox.Items.Count - 1;
-
-            this.LogTextBox.Text += DateTime.Now.ToString() + " " + text + "\n";
+            this.LogTextBox.Items.Add(DateTime.Now.ToString() + " " + text);
+            this.LogTextBox.SelectedIndex = this.LogTextBox.Items.Count - 1;
 
             return;
         }
@@ -56,6 +54,18 @@ namespace StrawhatNet.Study.BTRFCommDevTest
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new Uri("/DevConnectionPage.xaml", UriKind.Relative));
+        }
+
+        public static byte[] StringToAscii(string s)
+        {
+            byte[] retval = new byte[s.Length];
+            for (int ix = 0; ix < s.Length; ++ix)
+            {
+                char ch = s[ix];
+                if (ch <= 0x7f) retval[ix] = (byte)ch;
+                else retval[ix] = (byte)'?';
+            }
+            return retval;
         }
 
         private async void SendButton_Click(object sender, RoutedEventArgs e)
@@ -68,23 +78,42 @@ namespace StrawhatNet.Study.BTRFCommDevTest
 
             try
             {
-                List<byte> data = new List<byte>();
-                uint len = 1;
+                // 出力
+                DataWriter dw = new DataWriter(streamSocket.OutputStream);
+
+                List<byte> tmp = new List<byte>();
+                var writeData = this.MessageTextBox.Text;
+                var writeByteData = StringToAscii(writeData);
+                dw.WriteBytes(writeByteData);
+
+                var writeBytesSize = await dw.StoreAsync();
+                await dw.FlushAsync();
+
+                // 結果を読み取る
                 DataReader dr = new DataReader(streamSocket.InputStream);
-                while (true)
+
+                //var loadSize = await dr.LoadAsync(sizeof(byte));
+                //if (loadSize < sizeof(byte))
+                //{
+                //    WriteLog("切断されました");
+                //    return;
+                //}
+
+                //uint readSize = (uint)writeByteData.Length;
+                uint readSize = writeBytesSize;
+                var loadSize = await dr.LoadAsync(readSize);
+                if (loadSize < readSize)
                 {
-                    await dr.LoadAsync(len);
-                    byte b = dr.ReadByte();
-                    data.Add(b);
-                    if (b == 0x0A)
-                    {
-                        break;
-                    }
+                    WriteLog("切断されました");
+                    return;
                 }
+
+                var readByteData = new byte[readSize];
+                dr.ReadBytes(readByteData);
 
                 List<String> tmpList = new List<string>();
                 List<String> hexList = new List<String>();
-                foreach (byte b in data)
+                foreach (byte b in readByteData)
                 {
                     hexList.Add(string.Format("{0:X2}", b));
                     tmpList.Add(Char.ToString((char)b));
@@ -104,6 +133,10 @@ namespace StrawhatNet.Study.BTRFCommDevTest
         private void DisconnectButton_Click(object sender, RoutedEventArgs e)
         {
             Disconnect();
+
+            var dataContext = DataContext as MainPageViewModel;
+            dataContext.BluetoothDeviceInfo = new BluetoothDeviceInfo();
+
             return;
         }
 

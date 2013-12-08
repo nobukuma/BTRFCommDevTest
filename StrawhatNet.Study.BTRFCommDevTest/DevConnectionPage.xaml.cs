@@ -88,6 +88,8 @@ namespace StrawhatNet.Study.BTRFCommDevTest
             }
         }
 
+        private readonly byte[] ConnAck = new byte[] { 0xbe, 0xef, 8, 0x43, 0x4F, 0x4E, 0x4E, 0x5F, 0x41, 0x43, 0x4B, 0x11 };
+
         private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             if (this.deviceListBox.SelectedItem == null)
@@ -105,6 +107,27 @@ namespace StrawhatNet.Study.BTRFCommDevTest
             try
             {
                 await streamSocket.ConnectAsync(selectedDevice.HostName, "1");
+
+                while (true)
+                {
+                    DataReader dr = new DataReader(streamSocket.InputStream);
+
+                    var loadSize = await dr.LoadAsync((uint)ConnAck.Length);
+                    if (loadSize < sizeof(byte))
+                    {
+                        WriteLog("切断されました");
+                        return;
+                    }
+
+                    var readByteData = new byte[loadSize];
+                    dr.ReadBytes(readByteData);
+
+                    if (readByteData.SequenceEqual(ConnAck))
+                    {
+                        break;
+                    }
+                }
+
                 this.ConnectButton.IsEnabled = false;
                 this.bluetoothDeviceInfo.IsConnected = true;
                 this.bluetoothDeviceInfo.DisplayName = selectedDevice.DisplayName;

@@ -95,9 +95,9 @@
                     HorizontalContentAlignment="Center"
                     Click="DisconnectButton_Click"/>
 
-            <TextBox x:Name="messageTextBox"
+            <TextBox x:Name="MessageTextBox"
                      Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                     BorderThickness="3"/>
+                     BorderThickness="3" InputScope="Text"/>
             <Button x:Name="SendButton"
                     Grid.Row="2" Grid.Column="1"
                     Content="送信"
@@ -106,21 +106,18 @@
                     VerticalContentAlignment="Center"
                     Click="SendButton_Click"/>
 
-            <ScrollViewer Grid.Row="3" Grid.ColumnSpan="2">
-                <TextBox x:Name="LogTextBox" BorderThickness="3"/>
-            </ScrollViewer>
-
-            <!--<ListBox Grid.Row="3" BorderThickness="3" Margin="12"
-                  ScrollViewer.VerticalScrollBarVisibility="Visible"
-                        x:Name="LogTextBox" ItemTemplate="{StaticResource DataTemplate2}">
+            <ListBox Grid.Row="3" Grid.ColumnSpan="2"
+                     x:Name="LogTextBox"
+                     BorderThickness="3" Margin="12"
+                     ScrollViewer.VerticalScrollBarVisibility="Visible"
+                     ItemTemplate="{StaticResource DataTemplate2}">
                 <ListBox.Background>
                     <SolidColorBrush Color="#77A67D7D"/>
                 </ListBox.Background>
                 <ListBox.BorderBrush>
                 <SolidColorBrush Color="{StaticResource PhoneBorderColor}"/>
                 </ListBox.BorderBrush>
-            </ListBox>-->
-
+            </ListBox>
         </Grid>
     </Grid>
 
